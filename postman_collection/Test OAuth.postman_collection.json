@@ -1,0 +1,78 @@
+{
+	"id": "77f2f6ad-c016-991f-b0eb-02b63ffa8e67",
+	"name": "Test OAuth",
+	"description": "",
+	"order": [
+		"4ef84151-3fd6-d6e2-676f-85f7f49b288a",
+		"2474a602-bfe3-4d87-b85e-e800c4b422bc"
+	],
+	"folders": [],
+	"folders_order": [],
+	"timestamp": 1590232356554,
+	"owner": "9212911",
+	"public": false,
+	"requests": [
+		{
+			"id": "2474a602-bfe3-4d87-b85e-e800c4b422bc",
+			"headers": "Content-Type: application/json\n",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"url": "http://localhost:7000/user",
+			"queryParams": [],
+			"pathVariables": {},
+			"pathVariableData": [],
+			"preRequestScript": null,
+			"method": "POST",
+			"collectionId": "77f2f6ad-c016-991f-b0eb-02b63ffa8e67",
+			"data": [],
+			"dataMode": "raw",
+			"name": "Update user name using accessToken",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1590233393638,
+			"version": 2,
+			"responses": [],
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"rawModeData": "{\n\t\"user\": {\"name\":\"Test User\"\t},\n\t\"accessToken\":\"xyx\"\n}"
+		},
+		{
+			"id": "4ef84151-3fd6-d6e2-676f-85f7f49b288a",
+			"headers": "",
+			"headerData": [],
+			"url": "http://localhost:7000/user?accessToken=xyz",
+			"queryParams": [
+				{
+					"key": "accessToken",
+					"value": "xyz",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
+			"pathVariables": {},
+			"pathVariableData": [],
+			"preRequestScript": null,
+			"method": "GET",
+			"collectionId": "77f2f6ad-c016-991f-b0eb-02b63ffa8e67",
+			"data": null,
+			"dataMode": "params",
+			"name": "Fetch user data using accessToken",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1590233370203,
+			"version": 2,
+			"responses": [],
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		}
+	]
+}

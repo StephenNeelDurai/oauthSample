@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oauth Test</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    <script>
+        var apiUrl = "http://localhost:7000/user";
+        var reqBody = { "user": {}, "accessToken": null };
+        var counter = 7;
+        function commonAjax({ apiUrl, method, reqBody }, cb) {
+            $.ajax({
+                url: apiUrl,
+                type: method,
+                data: reqBody,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: (response) => {
+                    cb(response)
+                },
+                error: (error) => {
+                    alert("Something Went Wrong!");
+                }
+            });
+        }
+        function fetchUserData(accessToken) {
+            document.getElementById("fetchButton").disabled = true;
+            reqBody.accessToken = accessToken;
+            commonAjax({ apiUrl: apiUrl, method: 'GET', reqBody: reqBody }, (response) => {
+                setUserDetails(response);
+            })
+        }
+        function updateUser(accessToken) {
+            var getUserName = document.getElementById("userName");
+            var setUserName = document.getElementById("user_name");
+            var updateButton = document.getElementById("updateButton");
+            if (getUserName && getUserName.value && getUserName.value.trim() && getUserName.value.length && getUserName.value !== setUserName.innerText) {
+                reqBody.accessToken = accessToken;
+                reqBody.user.name = getUserName.value;
+                updateButton.disabled = true;
+                commonAjax({ apiUrl: apiUrl, method: 'POST', reqBody: JSON.stringify(reqBody) }, (response) => {
+                    updateButton.disabled = false;
+                    if (response && response.status && response.data && response.data.user && response.data.user.name) {
+                        setUserName.innerHTML = response.data.user.name;
+                    }
+                })
+            } else {
+                alert("User Name Must Not Be Empty And Different From Old!")
+            }
+        }
+        function setUserDetails(response) {
+            let data = response.data || null;
+            if (data && data.user && data.user.details) {
+                let userDetails = data.user.details;
+                document.getElementById("clearMessage").innerHTML = `Note : This Data Will be clear within ${counter} sec`;
+                if (userDetails.address) document.getElementById("address").innerHTML = `Address : ${JSON.stringify(userDetails.address)}`;
+                if (userDetails.phone) document.getElementById("phone").innerHTML = `Phone : ${JSON.stringify(userDetails.phone)}`;
+                if (userDetails.message) document.getElementById("message").innerHTML = `Message : ${JSON.stringify(data.message)}`;
+                clearUserDetails();
+            } else {
+                alert("Something Went Wrong!");
+            }
+        }
+        function clearUserDetails() {
+            var intervalId = setInterval(() => {
+                counter--;
+                document.getElementById("clearMessage").innerHTML = `Note : This Data Will be clear within ${counter} sec`;
+                if (!counter) {
+                    document.getElementById("clearMessage").innerHTML = '';
+                    document.getElementById("address").innerHTML = '';
+                    document.getElementById("phone").innerHTML = '';
+                    document.getElementById("message").innerHTML = '';
+                    counter = 7;
+                    document.getElementById("fetchButton").disabled = false;
+                    clearInterval(intervalId);
+                }
+            }, 1000);
+        }
+    </script>
+</head>
+<style>
+    body {
+        background-color: lightseagreen;
+        color: white;
+    }
+
+    .button-clr {
+        color: brown;
+        font-weight: 700;
+    }
+
+    .user-details img {
+        max-width: 70px;
+    }
+
+    .user-details div {
+        padding: 10px;
+    }
+
+    .user-details h6 {
+        padding: 10px;
+        ;
+    }
+
+    .user-details h3 {
+        display: inline;
+    }
+
+    #clearMessage {
+        font-weight: 700;
+        color: red;
+    }
+
+    #accessToken {
+        cursor: pointer;
+        width: 900px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis
+    }
+</style>
+
+<body>
+    <div class="container" style="padding:20px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="text-center">
+                    <h1>Oauth Login Test</h1>
+                    <% if (typeof user != 'undefined' && user.isLoggedIn) { %>
+                    <a href="/logout" style="float: right;" class="btn btn-outline-dark button-clr"
+                        role="button">Logout</a>
+                    <% }%>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="text-center user-details">
+                    <% if (typeof user != 'undefined' && user.isLoggedIn && user.name) { %>
+                    <img class="rounded-circle" alt="100x100" src="<%= user.image %>" data-holder-rendered="true">
+                    <h3>Hi <span id="user_name"><%= user.name %></span> </h3>
+                    <h6 id="accessToken" data-toggle="tooltip" title="<%= user.accessToken %>"> Your accessToken is :
+                        <%= user.accessToken %> </h6>
+                    <div>
+                        <p>Click Here To Fetch User Details.</p>
+                        <button type="button" class="btn btn-primary" id="fetchButton"
+                            onclick="fetchUserData(<%= JSON.stringify(user.accessToken) %>)">Load User
+                            Data</button>
+                    </div>
+                    <div>
+                        <h2 id="address"></h2>
+                        <h2 id="phone"></h2>
+                        <h2 id="message"></h2>
+                        <h2 id="clearMessage"></h2>
+                    </div>
+                    <% } else { %>
+                    <div>
+                        <h4>Click Here To Login</h4>
+                        <a href="/auth/google" class="btn btn-outline-dark button-clr" role="button"><i
+                                class='fab fa-google' style='font-size:15px;color:blue'></i> Login</a>
+                    </div>
+                    <% } %>
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="text-center user-details">
+                    <% if (typeof user != 'undefined' && user.isLoggedIn && user.name) { %>
+                    <input id="userName" type="text" value="<%= user.name%>">
+                    <button type="button" class="btn btn-primary" id="updateButton"
+                        onclick="updateUser(<%= JSON.stringify(user.accessToken) %>)">Update User
+                        Name</button>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
